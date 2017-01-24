@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Mozg. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<layout version="0.1.0">
+
+    <customer_account_create>
+        <reference name="head">
+            <action method="addJs">
+                <script>mozg_customer/script.js</script>
+                <params><![CDATA[name=""]]></params>
+            </action>
+        </reference>
+        <reference name="customer_form_register">
+            <!-- http://www.pauldonnelly.net/magento-display-address-fields-in-create-an-account/ -->
+            <action method="setShowAddressFields" ifconfig="customer/mozg_customer/active_address_fields_create_account">
+                <value>true</value>
+            </action>
+            <action method="setTemplate" ifconfig="customer/mozg_customer/active_customer_forms">
+                <template>mozg_customer/customer/form/register.phtml</template>
+            </action>
+        </reference>
+    </customer_account_create>
+
+    <customer_account_edit translate="label">
+        <reference name="head">
+            <action method="addJs">
+                <script>mozg_customer/script.js</script>
+                <params><![CDATA[name=""]]></params>
+            </action>
+        </reference>
+        <block name="customer_edit">
+            <action method="setTemplate" ifconfig="customer/mozg_customer/active_customer_forms">
+                <template>mozg_customer/customer/form/edit.phtml</template>
+            </action>
+        </block>
+    </customer_account_edit>
+
+    <customer_address_form translate="label">
+        <reference name="head">
+            <action method="addJs">
+                <script>mozg_customer/script.js</script>
+                <params><![CDATA[name=""]]></params>
+            </action>
+        </reference>
+        <block name="customer_address_edit">
+            <action method="setTemplate" ifconfig="customer/mozg_customer/active_customer_forms">
+                <template>mozg_customer/customer/address/edit.phtml</template>
+            </action>
+        </block>
+    </customer_address_form>
+
+    <checkout_onepage_index>
+        <reference name="head">
+            <action method="addJs">
+                <script>mozg_customer/script.js</script>
+                <params><![CDATA[name=""]]></params>
+            </action>
+        </reference>
+        <reference name="checkout.onepage.billing">
+            <action method="setTemplate" ifconfig="customer/mozg_customer/active_customer_forms">
+                <template>mozg_customer/persistent/checkout/onepage/billing.phtml</template>
+            </action>
+        </reference>
+    </checkout_onepage_index>
+
+    <checkout_multishipping_billing>
+        <reference name="head">
+            <action method="addJs">
+                <script>mozg_customer/script.js</script>
+                <params><![CDATA[name=""]]></params>
+            </action>
+        </reference>
+    </checkout_multishipping_billing>
+
+    <onestepcheckout_index_index>
+        <reference name="head">
+            <action method="addJs">
+                <script>mozg_customer/script.js</script>
+                <params><![CDATA[name=""]]></params>
+            </action>
+        </reference>
+    </onestepcheckout_index_index>
+
+    <opc_index_index>
+        <reference name="head">
+            <action method="addJs">
+                <script>mozg_customer/script.js</script>
+                <params><![CDATA[name=""]]></params>
+            </action>
+        </reference>
+        <reference name="checkout.onepage.billing">
+            <action method="setTemplate" ifconfig="customer/mozg_customer/active_customer_forms">
+                <template>mozg_customer/opc/onepage/billing.phtml</template>
+            </action>
+        </reference>
+    </opc_index_index>
+
+</layout>
