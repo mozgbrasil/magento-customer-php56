@@ -1,0 +1,398 @@
+
+
+<?php
+    /**
+     * Copyright © 2016 Mozg. All rights reserved.
+     * See LICENSE.txt for license details.
+     */
+    ?>
+<!-- /app/design/frontend/rwd/default/template/customer/address/edit.phtml -->
+<?php if($this->getTitle()): ?>
+<div class="page-title">
+    <h1><?php echo $this->getTitle() ?></h1>
+</div>
+<?php endif; ?>
+<?php echo $this->getMessagesBlock()->toHtml() ?>
+<form action="<?php echo $this->getSaveUrl() ?>" method="post" id="form-validate" class="scaffold-form" enctype="multipart/form-data">
+    <div class="fieldset">
+        <?php echo $this->getBlockHtml('formkey')?>
+        <input type="hidden" name="success_url" value="<?php echo $this->getSuccessUrl() ?>" />
+        <input type="hidden" name="error_url" value="<?php echo $this->getErrorUrl() ?>" />
+        <h2 class="legend"><?php echo $this->__('Contact Information') ?></h2>
+        <p class="required"><?php echo $this->__('* Required Fields') ?></p>
+        <ul class="form-list">
+            <li class="fields">
+                <?php echo $this->getNameBlockHtml() ?>
+            </li>
+            <li class="wide">
+                <label for="company"><?php echo $this->__('Company') ?></label>
+                <div class="input-box">
+                    <input type="text" name="company" id="company" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Company')) ?>" value="<?php echo $this->escapeHtml($this->getAddress()->getCompany()) ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('company') ?>" />
+                </div>
+            </li>
+            <li class="fields">
+                <div class="field">
+                    <label for="telephone" class="required"><em>*</em><?php echo $this->__('Telephone') ?></label>
+                    <div class="input-box">
+                        <input type="tel" name="telephone" value="<?php echo $this->escapeHtml($this->getAddress()->getTelephone()) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Telephone')) ?>" class="input-text  <?php echo $this->helper('customer/address')->getAttributeValidationClass('telephone') ?>" id="telephone" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="fax"><?php echo $this->__('Fax') ?></label>
+                    <div class="input-box">
+                        <input type="tel" name="fax" id="fax" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Fax')) ?>" value="<?php echo $this->escapeHtml($this->getAddress()->getFax()) ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('fax') ?>" />
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="fieldset">
+        <h2 class="legend"><?php echo $this->__('Address') ?></h2>
+        <ul class="form-list">
+            <li class="fields">
+                <div class="field">
+                    <label for="zip" class="required"><em>*</em><?php echo $this->__('Zip/Postal Code') ?></label>
+                    <div class="input-box">
+                        <input type="text" name="postcode" value="<?php echo $this->escapeHtml($this->getAddress()->getPostcode()) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Zip/Postal Code')) ?>" id="zip" class="input-text validate-zip-international <?php echo $this->helper('customer/address')->getAttributeValidationClass('postcode') ?>" />
+                    </div>
+                </div>
+                <div class="field" id="loading_spinner">
+                    <label>&nbsp;</label>
+                    <div class="input-box">
+                        <?php $_filename = $this->getSkinUrl('images/mozg_base/loading.io.svg'); ?>
+                        <img src="<?php echo $_filename; ?>" />
+                    </div>
+                </div>
+                <script>
+                    $('loading_spinner').hide();
+                </script>
+            </li>
+
+            <?php $_streetValidationClass = $this->helper('customer/address')->getAttributeValidationClass('street'); ?>
+
+            <?php if(Mage::getStoreConfig('customer/mozg_customer/address_storage_format') == 1){ ?>
+
+            <?php 
+
+            $mozg_helper = Mage::helper('mozg_base/order');
+
+            $model_address = $this->getAddress();
+
+            $rua = $mozg_helper->getStreet($model_address)->getData('logradouro_sem_numero');
+            $numero = $mozg_helper->getStreet($model_address)->getData('numero_logradouro');
+            $complemento = $mozg_helper->getStreet($model_address)->getData('complemento');
+
+             ?>
+
+            <!-- MOZG -->
+            <li class="fields">
+                <div class="field">
+                    <label for="rua" class="required"><em>*</em><?php echo $this->__('Street Address') ?></label>
+                    <div class="input-box">
+                        <input type="text" name="rua" id="rua" value="<?php echo $rua ?>" title="<?php echo $this->__('Street Address') ?>" class="input-text required-entry" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="numero" class="required"><em>*</em><?php echo $this->__('Number') ?></label>
+                    <div class="input-box">
+                        <input type="text" name="numero" id="numero" value="<?php echo $numero ?>" title="<?php echo $this->__('Number') ?>" class="input-text required-entry" />
+                    </div>
+                </div>
+            </li>
+            <li class="fields">
+                <div class="field">
+                    <label for="complemento"><?php echo $this->__('Complemento') ?></label>
+                    <div class="input-box">
+                        <input type="text" name="complemento" id="complemento" value="<?php echo $complemento ?>" title="<?php echo $this->__('Complemento') ?>" class="input-text " />
+                    </div>
+                </div>
+            </li>
+            <script type="text/javascript">
+                //<![CDATA[
+                    setInterval(function() { 
+            
+                        /*console.info('street_1');
+                        console.log($('street_1').value);
+                        console.log($('rua').value);
+                        console.log($('numero').value);*/
+        
+                        string = '';
+        
+                        if($('numero').value){
+                                string += $('rua').value + ', ' + $('numero').value;
+                        }
+        
+                        if($('complemento').value){
+                                string += ' - ' + $('complemento').value;
+                        }
+        
+                        $('street_1').value = string;
+            
+                    }, 1000);
+                //]]>
+            </script>
+            <!-- MOZG -->
+            <!-- MOZG -->
+            <li class="wide" style="display:none">
+                <label for="street_1" class="required"><em>*</em><?php echo $this->__('Street Address') ?></label>
+                <div class="input-box">
+                    <input type="text" name="street[]" value="<?php echo $this->escapeHtml($this->getAddress()->getStreet(1)) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Street Address')) ?>" id="street_1" class="input-text <?php echo $_streetValidationClass ?>" />
+                </div>
+            </li>
+            <li class="wide">
+                <label for="street_2" class="required"><em>*</em><?php echo $this->__('Neighborhood') ?></label>
+                <div class="input-box">
+                    <input type="text" name="street[]" value="<?php echo $this->escapeHtml($this->getAddress()->getStreet(2)) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Neighborhood')) ?>" id="street_2" class="input-text <?php echo $_streetValidationClass ?> required-entry" />
+                </div>
+            </li>
+            <!-- MOZG -->
+
+            <?php }else{ ?>
+
+            <li class="wide">
+                <label for="street_1" class="required"><em>*</em><?php echo $this->__('Street Address') ?></label>
+                <div class="input-box">
+                    <input type="text" name="street[]" value="<?php echo $this->escapeHtml($this->getAddress()->getStreet(1)) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Street Address')) ?>" id="street_1" class="input-text <?php echo $_streetValidationClass ?>" />
+                </div>
+            </li>
+            <?php $_streetValidationClass = trim(str_replace('required-entry', '', $_streetValidationClass)); ?>
+            <?php for ($_i = 2, $_n = $this->helper('customer/address')->getStreetLines(); $_i <= $_n; $_i++): ?>
+            <li class="wide">
+                <label for="street_<?php echo $_i ?>" <?php if ($_i != 3): ?> class="required" <?php endif; ?>><?php if ($_i != 3): ?> <em>*</em> <?php endif; ?><?php echo $this->__('Street Address ' . $_i) ?></label>
+                <div class="input-box">
+                    <input type="text" name="street[]" value="<?php echo $this->escapeHtml($this->getAddress()->getStreet($_i)) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Street Address %s', $_i)) ?>" id="street_<?php echo $_i ?>" class="input-text <?php echo $_streetValidationClass ?> <?php if ($_i != 3): ?>required-entry<?php endif; ?>" />
+                </div>
+            </li>
+            <?php endfor; ?>
+
+            <?php } ?>
+
+            <?php if ($this->helper('customer/address')->isVatAttributeVisible()) : ?>
+            <li class="wide">
+                <label for="vat_id"><?php echo $this->__('VAT Number') ?></label>
+                <div class="input-box">
+                    <input type="text" name="vat_id" value="<?php echo $this->escapeHtml($this->getAddress()->getVatId()) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('VAT Number')) ?>" id="vat_id" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('vat_id') ?>" />
+                </div>
+            </li>
+            <?php endif; ?>
+            <li class="fields">
+                <div class="field">
+                    <label for="city" class="required"><em>*</em><?php echo $this->__('City') ?></label>
+                    <div class="input-box">
+                        <input type="text" name="city" value="<?php echo $this->escapeHtml($this->getAddress()->getCity()) ?>"  title="<?php echo Mage::helper('core')->quoteEscape($this->__('City')) ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('city') ?>" id="city" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="region_id" class="required"><em>*</em><?php echo $this->__('State/Province') ?></label>
+                    <div class="input-box">
+                        <select id="region_id" name="region_id" title="<?php echo Mage::helper('core')->quoteEscape($this->__('State/Province')) ?>" class="validate-select" style="display:none;">
+                            <option value=""><?php echo $this->__('Please select region, state or province') ?></option>
+                        </select>
+                        <script type="text/javascript">
+                            //<![CDATA[
+                                    $('region_id').setAttribute('defaultValue',  "<?php echo $this->getAddress()->getRegionId() ?>");
+                            //]]>
+                        </script>
+                        <input type="text" id="region" name="region" value="<?php echo $this->escapeHtml($this->getAddress()->getRegion()) ?>"  title="<?php echo Mage::helper('core')->quoteEscape($this->__('State/Province')) ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('region') ?>" />
+                    </div>
+                </div>
+            </li>
+            <li class="fields">
+                <div class="field">
+                    <label for="country" class="required"><em>*</em><?php echo $this->__('Country') ?></label>
+                    <div class="input-box">
+                        <?php echo $this->getCountryHtmlSelect() ?>
+                    </div>
+                </div>
+            </li>
+            <li<?php if($this->canSetAsDefaultBilling()) echo ' class="control"' ?>>
+                <?php if($this->isDefaultBilling()): ?>
+                <strong><?php echo $this->__('Default Billing Address') ?></strong>
+                <?php elseif($this->canSetAsDefaultBilling()): ?>
+                <input type="checkbox" id="primary_billing" name="default_billing" value="1" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Use as My Default Billing Address')) ?>" class="checkbox" /><label for="primary_billing"><?php echo $this->__('Use as my default billing address') ?></label>
+                <?php else: ?>
+                <input type="hidden" name="default_billing" value="1" />
+                <?php endif; ?>
+            </li>
+            <li<?php if($this->canSetAsDefaultShipping()) echo ' class="control"' ?>>
+                <?php if($this->isDefaultShipping()): ?>
+                <strong><?php echo $this->__('Default Shipping Address') ?></strong>
+                <?php elseif($this->canSetAsDefaultShipping()): ?>
+                <input type="checkbox" id="primary_shipping" name="default_shipping" value="1" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Use as My Default Shipping Address')) ?>" class="checkbox" /><label for="primary_shipping"><?php echo $this->__('Use as my default shipping address') ?></label>
+                <?php else: ?>
+                <input type="hidden" name="default_shipping" value="1" />
+                <?php endif; ?>
+            </li>
+        </ul>
+    </div>
+    <div class="buttons-set">
+        <p class="back-link"><a href="<?php echo $this->escapeUrl($this->getBackUrl()) ?>"><small>&laquo; </small><?php echo $this->__('Back') ?></a></p>
+        <button type="submit" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Save Address')) ?>" class="button"><span><span><?php echo $this->__('Save Address') ?></span></span></button>
+    </div>
+</form>
+<script type="text/javascript">
+    //<![CDATA[
+        var dataForm = new VarienForm('form-validate', true);
+        new RegionUpdater('country', 'region', 'region_id', <?php echo $this->helper('directory')->getRegionJson() ?>, undefined, 'zip');
+    //]]>
+</script>
+<!-- MOZG -->
+<?php 
+$secure = Mage::getStoreConfigFlag('web/secure/use_in_frontend');
+$baseUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, $secure);
+
+$url_buscacep = $baseUrl . 'mozg_customer/index/buscacep';
+
+?>
+<?php /* ?>
+<script type='text/javascript' src='http://digitalbush.com/wp-includes/js/jquery/jquery.js?ver=1.11.2'></script>
+<script type='text/javascript' src='http://digitalbush.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+<script type="text/javascript">
+    jQuery.noConflict();
+</script>
+<?php */ ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.js" type="text/javascript"></script>
+<script type="text/javascript">
+    jQuery(function($) {
+
+        // http://pedroelsner.com/2012/07/mascara-jquery-para-novo-digito-de-celular-em-sao-paulo/
+
+        // jQuery Masked Input
+        if ($('telephone')) {
+            jQuery('#telephone').focusout(function() {
+                var phone, element;
+                element = $(this);
+                element.unmask();
+                phone = element.val().replace(/\D/g, '');
+                if (phone.length > 10) {
+                    element.mask("(99) 99999-999?9");
+                } else {
+                    element.mask("(99) 9999-9999?9");
+                }
+            }).trigger('focusout');
+        }
+
+        if ($('fax')) {
+            jQuery('#fax').focusout(function() {
+                var phone, element;
+                element = $(this);
+                element.unmask();
+                phone = element.val().replace(/\D/g, '');
+                if (phone.length > 10) {
+                    element.mask("(99) 99999-999?9");
+                } else {
+                    element.mask("(99) 9999-9999?9");
+                }
+            }).trigger('focusout');
+        }
+
+    });
+
+    if ($('zip')) {
+        function zip_Event(event) {
+            var element = event.element();
+            $('zip').removeClassName("validate-zip-international");
+            $('zip').addClassName("validate-zip-brasil");
+        }
+
+        jQuery('#zip').mask('99999-999');
+
+        $('zip').observe('focus', zip_Event);
+
+        Event.observe('zip', 'blur', function(event) {
+            buscar_cep('<?php echo $url_buscacep; ?>');
+        });
+    }
+
+    <?php if(Mage::getStoreConfig('customer/mozg_customer/address_storage_format') == 1){ ?>
+
+    if ($('street_1')) {
+        $('street_1').addClassName("validate-street-address");
+    }
+
+    <?php } ?>
+
+    function buscar_cep(url) {
+
+        var CEP = $('zip').value;
+
+        if (CEP == '') {
+            return false
+        }
+
+        var url = url;
+
+        new Ajax.Request(url, {
+            method: 'get',
+            parameters: 'cep=' + CEP,
+            onLoading: function(transport) {
+                console.log('onLoading');
+
+                $('loading_spinner').show();
+
+                pre.show('Processando...');
+                pre.hide();
+            },
+            onCreate: function(transport) {
+                console.log('onCreate');
+            },
+            onComplete: function(transport) {
+                console.log('onComplete');
+
+                $('loading_spinner').hide();
+
+                response = transport.responseText.evalJSON();
+
+                if (response.logradouro) {
+                    endereco = response.logradouro;
+                }
+
+                if (response.endereco) {
+                    endereco = response.endereco;
+                }
+
+                <?php if(Mage::getStoreConfig('customer/mozg_customer/address_storage_format') == 1){ ?>
+
+                        if ($('rua')) {
+                        $('rua').value = endereco;
+                        }
+
+                        if ($('street_2')) {
+                        $('street_2').value = response.bairro;
+                        }
+
+                <?php }else{ ?>
+
+                        if ($('street_1')) {
+                        $('street_1').value = endereco;
+                        }
+
+                        if ($('street_4')) {
+                        $('street_4').value = response.bairro;
+                        }
+
+                <?php } ?>
+
+                if ($('city')) {
+                    $('city').value = response.cidade;
+                }
+
+                if ($('region')) {
+                    $('region').value = response.uf;
+                }
+
+                if ($('region_id')) {
+                    selectEstado($('region_id'), response.uf);
+                }
+
+                setSelected($('country'), 'BR');
+                $('country').triggerEvent('change');
+
+                console.log('Complete');
+
+            }
+        });
+
+    }  
+</script>
+<!-- MOZG -->

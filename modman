@@ -1,0 +1,12 @@
+## Modman Module Mozg
+app/code/local/Mozg/Customer/	app/code/local/Mozg/Customer/
+app/design/adminhtml/default/default/layout/mozg_customer.xml	app/design/adminhtml/default/default/layout/mozg_customer.xml
+app/design/adminhtml/default/default/template/mozg_customer/	app/design/adminhtml/default/default/template/mozg_customer/
+app/design/frontend/base/default/layout/mozg_customer.xml	app/design/frontend/base/default/layout/mozg_customer.xml
+app/design/frontend/base/default/template/mozg_customer/	app/design/frontend/base/default/template/mozg_customer/
+app/etc/modules/Mozg_Customer.xml	app/etc/modules/Mozg_Customer.xml
+app/locale/pt_BR/Mozg_Customer.csv	app/locale/pt_BR/Mozg_Customer.csv
+js/mozg_customer/	js/mozg_customer/
+skin/adminhtml/default/default/images/mozg_customer/	skin/adminhtml/default/default/images/mozg_customer/
+skin/frontend/base/default/css/mozg_customer/	skin/frontend/base/default/css/mozg_customer/
+skin/frontend/base/default/images/mozg_customer/	skin/frontend/base/default/images/mozg_customer/
