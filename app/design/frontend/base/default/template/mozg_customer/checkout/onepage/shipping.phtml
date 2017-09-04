@@ -1,0 +1,551 @@
+<?php
+/**
+ * Copyright © 2016 Mozg. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+?>
+
+<!-- /app/design/frontend/rwd/default/template/checkout/onepage/shipping.phtml -->
+
+<form action="" id="co-shipping-form">
+    <ul class="form-list">
+    <?php if ($this->customerHasAddresses()): ?>
+       <li class="wide">
+           <label for="shipping-address-select"><?php echo $this->__('Select a shipping address from your address book or enter a new address.') ?></label>
+           <div class="input-box">
+               <?php echo $this->getAddressesHtmlSelect('shipping') ?>
+           </div>
+       </li>
+    <?php endif ?>
+        <li id="shipping-new-address-form"<?php if ($this->customerHasAddresses()): ?> style="display:none;"<?php endif ?> class="scaffold-form">
+            <div class="fieldset">
+                <p class="required"><?php echo $this->__('* Required Fields') ?></p>
+                <input type="hidden" name="shipping[address_id]" value="<?php echo $this->getAddress()->getId() ?>" id="shipping:address_id" />
+                <ul>
+                    <li class="fields"><?php echo $this->getLayout()->createBlock('customer/widget_name')->setObject($this->getAddress())->setFieldIdFormat('shipping:%s')->setFieldNameFormat('shipping[%s]')->setFieldParams('onchange="shipping.setSameAsBilling(false)"')->toHtml() ?></li>
+                    <li class="fields">
+                        <div class="fields">
+                            <label for="shipping:company"><?php echo $this->__('Company') ?></label>
+                            <div class="input-box">
+                                <input type="text" id="shipping:company" name="shipping[company]" value="<?php echo $this->escapeHtml($this->getAddress()->getCompany()) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Company')) ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('company') ?>" onchange="shipping.setSameAsBilling(false);" />
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="fields">
+                        <div class="field">
+                            <label for="shipping:postcode" class="required"><em>*</em><?php echo $this->__('Zip/Postal Code') ?></label>
+                            <div class="input-box">
+                                <input type="text" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Zip/Postal Code')) ?>" name="shipping[postcode]" id="shipping:postcode" value="<?php echo $this->escapeHtml($this->getAddress()->getPostcode()) ?>" class="input-text validate-zip-international <?php echo $this->helper('customer/address')->getAttributeValidationClass('postcode') ?>" onchange="shipping.setSameAsBilling(false);" />
+                            </div>
+                        </div>
+                        <div class="field" id="shipping:loading_spinner">
+                            <label>&nbsp;</label>
+                            <div class="input-box">
+                                <?php $_filename = $this->getSkinUrl('images/mozg_base/loading.io.svg'); ?>
+                                <img src="<?php echo $_filename; ?>" />
+                            </div>
+                        </div>
+                        <script>
+                            $('shipping:loading_spinner').hide();
+                        </script>
+                    </li>
+
+                <?php $_streetValidationClass = $this->helper('customer/address')->getAttributeValidationClass('street'); ?>
+
+                <?php if(Mage::getStoreConfig('customer/mozg_customer/address_storage_format') == 1){ ?>
+
+                    <!-- MOZG -->
+                    <li class="fields">
+                        <div class="field">
+                            <label for="shipping_rua" class="required"><em>*</em><?php echo Mage::helper('mozg_customer')->__('Street Address') ?></label>
+                            <div class="input-box">
+                                <input type="text" name="shipping_rua" id="shipping_rua" value="" title="<?php echo Mage::helper('mozg_customer')->__('Street Address') ?>" class="input-text required-entry" />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="shipping_numero" class="required"><em>*</em><?php echo Mage::helper('mozg_customer')->__('Number') ?></label>
+                            <div class="input-box">
+                                <input type="text" name="shipping_numero" id="shipping_numero" value="" title="<?php echo Mage::helper('mozg_customer')->__('Number') ?>" class="input-text required-entry validate-zero-or-greater" />
+                            </div>
+                        </div>
+                    </li>
+                    <li class="fields">
+                        <div class="field">
+                            <label for="shipping_complemento"><?php echo Mage::helper('mozg_customer')->__('Complemento') ?></label>
+                            <div class="input-box">
+                                <input type="text" name="shipping_complemento" id="shipping_complemento" value="" title="<?php echo Mage::helper('mozg_customer')->__('Complemento') ?>" class="input-text " />
+                            </div>
+                        </div>
+                    </li>
+                    <script type="text/javascript">
+                        //<![CDATA[
+                            setInterval(function() { 
+                    
+                                /*console.info('street_1');
+                                console.log($('street_1').value);
+                                console.log($('rua').value);
+                                console.log($('numero').value);*/
+                
+                                string = '';
+                
+                                if($('shipping_numero').value){
+                                        string += $('shipping_rua').value + ', ' + $('shipping_numero').value;
+                                }
+                
+                                if($('shipping_complemento').value){
+                                        string += ' - ' + $('shipping_complemento').value;
+                                }
+                
+                                $('shipping:street1').value = string;
+                    
+                            }, 1000);
+                        //]]>
+                    </script>
+                    <!-- MOZG -->
+                    <!-- MOZG -->
+                    <li class="wide" style="display:none">
+                        <label for="shipping:street1" class="required"><em>*</em><?php echo $this->__('Address') ?></label>
+                        <div class="input-box">
+                            <input type="text" title="<?php echo $this->quoteEscape($this->__('Address')) ?>" name="shipping[street][]" id="shipping:street1" value="<?php echo $this->escapeHtml($this->getAddress()->getStreet(1)) ?>" class="input-text <?php echo $_streetValidationClass ?>" />
+                        </div>
+                    </li>
+                    <li class="wide">
+                        <label for="shipping:street2" class="required"><em>*</em><?php echo $this->__('Neighborhood') ?></label>
+                        <div class="input-box">
+                            <input type="text" title="<?php echo $this->quoteEscape($this->__('Neighborhood')) ?>" name="shipping[street][]" id="shipping:street2" value="<?php echo $this->escapeHtml($this->getAddress()->getStreet(2)) ?>" class="input-text <?php echo $_streetValidationClass ?> required-entry" />
+                        </div>
+                    </li>
+                    <!-- MOZG -->
+
+                <?php }else{ ?>
+
+                    <li class="wide">
+                        <label for="shipping:street1" class="required"><em>*</em><?php echo $this->__('Address') ?></label>
+                        <div class="input-box">
+                            <input type="text" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Street Address')) ?>" name="shipping[street][]" id="shipping:street1" value="<?php echo $this->escapeHtml($this->getAddress()->getStreet(1)) ?>" class="input-text <?php echo $_streetValidationClass ?>" onchange="shipping.setSameAsBilling(false);" />
+                        </div>
+                    </li>
+                <?php $_streetValidationClass = trim(str_replace('required-entry', '', $_streetValidationClass)); ?>
+                <?php for ($_i = 2, $_n = $this->helper('customer/address')->getStreetLines(); $_i <= $_n; $_i++): ?>
+                    <li class="wide">
+                        <label for="shipping:street<?php echo $_i ?>" <?php if ($_i != 3): ?> class="required" <?php endif; ?>><?php if ($_i != 3): ?> <em>*</em> <?php endif; ?><?php echo $this->__('Street Address ' . $_i) ?></label>
+                        <div class="input-box">
+                            <input type="text" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Street Address %s', $_i)) ?>" name="shipping[street][]" id="shipping:street<?php echo $_i ?>" value="<?php echo $this->escapeHtml($this->getAddress()->getStreet($_i)) ?>" class="input-text <?php echo $_streetValidationClass ?> <?php if ($_i != 3): ?>required-entry<?php endif; ?> <?php if ($_i == 2): ?>validate-zero-or-greater<?php endif; ?>" onchange="shipping.setSameAsBilling(false);" />
+                        </div>
+                    </li>
+                <?php endfor; ?>
+
+                <?php } ?>
+
+                <?php if ($this->helper('customer/address')->isVatAttributeVisible()) : ?>
+                    <li class="wide">
+                        <label for="shipping:vat_id"><?php echo $this->__('VAT Number'); ?></label>
+                        <div class="input-box">
+                            <input type="text" id="shipping:vat_id" name="shipping[vat_id]" value="<?php echo $this->escapeHtml($this->getAddress()->getVatId()); ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('VAT Number')); ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('vat_id') ?>" />
+                        </div>
+                    </li>
+                <?php endif; ?>
+                    <li class="fields">
+                        <div class="field">
+                            <label for="shipping:city" class="required"><em>*</em><?php echo $this->__('City') ?></label>
+                            <div class="input-box">
+                                <input type="text" title="<?php echo Mage::helper('core')->quoteEscape($this->__('City')) ?>" name="shipping[city]" value="<?php echo $this->escapeHtml($this->getAddress()->getCity()) ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('city') ?>" id="shipping:city" onchange="shipping.setSameAsBilling(false);" />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="shipping:region" class="required"><em>*</em><?php echo $this->__('State/Province') ?></label>
+                            <div class="input-box">
+                                <select id="shipping:region_id" name="shipping[region_id]" title="<?php echo Mage::helper('core')->quoteEscape($this->__('State/Province')) ?>" class="validate-select" style="display:none;">
+                                    <option value=""><?php echo $this->__('Please select region, state or province') ?></option>
+                                </select>
+                                <script type="text/javascript">
+                                //<![CDATA[
+                                    $('shipping:region_id').setAttribute('defaultValue',  "<?php echo $this->getAddress()->getRegionId() ?>");
+                                //]]>
+                                </script>
+                                <input type="text" id="shipping:region" name="shipping[region]" value="<?php echo $this->escapeHtml($this->getAddress()->getRegion()) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('State/Province')) ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('region') ?>" style="display:none;" />
+                            </div>
+                        </div>
+                    </li>
+                    <li class="fields">
+                        <div class="field">
+                            <label for="shipping:country_id" class="required"><em>*</em><?php echo $this->__('Country') ?></label>
+                            <div class="input-box">
+                                <?php echo $this->getCountryHtmlSelect('shipping') ?>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="fields">
+                        <div class="field">
+                            <label for="shipping:telephone" class="required"><em>*</em><?php echo $this->__('Telephone') ?></label>
+                            <div class="input-box">
+                                <input type="tel" name="shipping[telephone]" value="<?php echo $this->escapeHtml($this->getAddress()->getTelephone()) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Telephone')) ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('telephone') ?>" id="shipping:telephone" onchange="shipping.setSameAsBilling(false);" />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="shipping:fax"><?php echo $this->__('Fax') ?></label>
+                            <div class="input-box">
+                                <input type="tel" name="shipping[fax]" value="<?php echo $this->escapeHtml($this->getAddress()->getFax()) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Fax')) ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('fax') ?>" id="shipping:fax" onchange="shipping.setSameAsBilling(false);" />
+                            </div>
+                        </div>
+                    </li>
+                <?php if ($this->isCustomerLoggedIn() && $this->customerHasAddresses()):?>
+                    <li class="control">
+                        <input type="checkbox" name="shipping[save_in_address_book]" value="1" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Save in address book')) ?>" id="shipping:save_in_address_book" onchange="shipping.setSameAsBilling(false);"<?php if ($this->getAddress()->getSaveInAddressBook()):?> checked="checked"<?php endif;?> class="checkbox" /><label for="shipping:save_in_address_book"><?php echo $this->__('Save in address book') ?></label></li>
+                <?php else:?>
+                    <li class="no-display"><input type="hidden" name="shipping[save_in_address_book]" value="1" /></li>
+                <?php endif;?>
+                </ul>
+            </div>
+        </li>
+        <li class="control">
+            <input type="checkbox" name="shipping[same_as_billing]" id="shipping:same_as_billing" value="1"<?php if($this->getAddress()->getSameAsBilling()): ?> checked="checked"<?php endif; ?> title="<?php echo Mage::helper('core')->quoteEscape($this->__('Use Billing Address')) ?>" onclick="shipping.setSameAsBilling(this.checked)" class="checkbox" /><label for="shipping:same_as_billing"><?php echo $this->__('Use Billing Address') ?></label>
+        </li>
+    </ul>
+    <div class="buttons-set" id="shipping-buttons-container">
+        <p class="back-link"><a href="#" onclick="checkout.back(); return false;"><small>&laquo; </small><?php echo $this->__('Back') ?></a></p>
+        <button type="button" class="button" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Continue')) ?>" onclick="shipping.save()"><span><span><?php echo $this->__('Continue') ?></span></span></button>
+        <span id="shipping-please-wait" class="please-wait" style="display:none;">
+            <img src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif') ?>" alt="<?php echo Mage::helper('core')->quoteEscape($this->__('Loading next step...')) ?>" title="<?php echo Mage::helper('core')->quoteEscape($this->__('Loading next step...')) ?>" class="v-middle" /> <?php echo $this->__('Loading next step...') ?>
+        </span>
+    </div>
+</form>
+<script type="text/javascript">
+//<![CDATA[
+    var shipping = new Shipping('co-shipping-form', '<?php echo $this->getUrl('checkout/onepage/getAddress') ?>address/', '<?php echo $this->getUrl('checkout/onepage/saveShipping') ?>',
+        '<?php echo $this->getUrl('checkout/onepage/shippingMethod') ?>');
+    var shippingForm = new VarienForm('co-shipping-form');
+    shippingForm.extraChildParams = ' onchange="shipping.setSameAsBilling(false);"';
+    //shippingForm.setElementsRelation('shipping:country_id', 'shipping:region', '<?php echo $this->getUrl('directory/json/childRegion') ?>', '<?php echo Mage::helper('core')->jsQuoteEscape($this->__('Select State/Province...')) ?>');
+    $('shipping-address-select') && shipping.newAddress(!$('shipping-address-select').value);
+
+    var shippingRegionUpdater = new RegionUpdater('shipping:country_id', 'shipping:region', 'shipping:region_id', <?php echo $this->helper('directory')->getRegionJson() ?>, undefined, 'shipping:postcode');
+//]]>
+</script>
+
+<!-- MOZG -->
+<?php 
+$secure = Mage::getStoreConfigFlag('web/secure/use_in_frontend');
+$baseUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, $secure);
+        
+$url_buscacep = $baseUrl . 'mozg_customer/index/buscacep';
+$url_checkdocumento = $baseUrl . 'mozg_customer/index/checkdocumento';
+?>
+
+<script type="text/javascript">
+    jQuery(function($){
+
+        // http://pedroelsner.com/2012/07/mascara-jquery-para-novo-digito-de-celular-em-sao-paulo/
+
+        // jQuery Masked Input
+        if( $('shipping:telephone') ){
+            console.log('mozg_shipping_telephone');
+            jQuery('input[name*="telephone"]').focusout(function(){
+                var phone, element;
+                console.log('mozg_shipping_telephone_focusout');
+                element = $(this);
+                element.unmask();
+                phone = element.val().replace(/\D/g, '');
+                if(phone.length > 10) {
+                        element.mask("(99) 99999-999?9");
+                } else {
+                        element.mask("(99) 9999-9999?9");
+                }
+            }).trigger('focusout');
+        }
+
+        if( $('fax') ){
+            jQuery('input[name*="fax"]').focusout(function(){
+                var phone, element;
+                element = $(this);
+                element.unmask();
+                phone = element.val().replace(/\D/g, '');
+                if(phone.length > 10) {
+                        element.mask("(99) 99999-999?9");
+                } else {
+                        element.mask("(99) 9999-9999?9");
+                }
+            }).trigger('focusout');
+        }
+    
+    });
+    
+    if( $('shipping:postcode') ){
+        function zip_focusEvent(event) {
+            var element = event.element();
+            $('shipping:postcode').removeClassName("validate-zip-international");
+            $('shipping:postcode').addClassName("validate-zip-brasil");
+        }
+
+        jQuery('input[name*="postcode"]').mask('99999-999');
+
+        $('shipping:postcode').observe('focus', zip_focusEvent);
+
+        Event.observe('shipping:postcode', 'blur', function(event){ 
+            shipping_buscar_cep('<?php echo $url_buscacep; ?>');
+        });
+    }
+
+    <?php if(Mage::getStoreConfig('customer/mozg_customer/address_storage_format') == 1){ ?>
+    
+    if( $('shipping:street1') ){
+        $('shipping:street1').addClassName("validate-street-address");
+    }
+
+    <?php } ?>
+    
+    function shipping_buscar_cep(url) {
+
+        console.log(arguments.callee.name);
+    
+        var CEP = $('shipping:postcode').value;
+
+        if( CEP == ''){
+            return false
+        }
+
+        var url = url;
+
+        new Ajax.Request( url, {
+            method: 'get',
+            parameters: 'cep='+CEP,
+            onLoading: function(transport) {
+                console.log('onLoading');
+
+                $('shipping:loading_spinner').show();
+
+                pre.show('Processando...');
+                pre.hide();              
+            },
+            onCreate: function(transport) {
+                console.log('onCreate');
+            },
+            onComplete: function(transport) {
+                console.log('onComplete');
+
+                $('shipping:loading_spinner').hide();
+                
+                response = transport.responseText.evalJSON();
+
+                if(response.logradouro){
+                    endereco = response.logradouro;
+                }
+
+                if(response.endereco){
+                    endereco = response.endereco;
+                }
+
+                <?php if(Mage::getStoreConfig('customer/mozg_customer/address_storage_format') == 1){ ?>
+
+                    if ($('shipping_rua')) {
+                        $('shipping_rua').value = endereco;
+                    }
+
+                    if ($('shipping:street2')) {
+                        $('shipping:street2').value = response.bairro;
+                    }
+
+                <?php }else{ ?>
+
+                    if ($('shipping:street1')) {
+                        $('shipping:street1').value = endereco;
+                    }
+
+                    if ($('shipping:street4')) {
+                        $('shipping:street4').value = response.bairro;
+                    }
+
+                <?php } ?>
+
+                if ($('shipping:city')){
+                    $('shipping:city').value = response.cidade;
+                }
+
+                if ($('shipping:region')){
+                    $('shipping:region').value = response.uf;
+                }
+
+                if ($('shipping:region_id')){
+                    selectEstado($('shipping:region_id'), response.uf );
+                }
+
+                setSelected($('shipping:country'), 'BR' );
+                $('shipping:country').triggerEvent('change');
+
+                console.log('Complete');
+
+            }
+        });
+    
+    }
+     
+</script>
+<script type="text/javascript">
+    //
+    
+    function randomnumber() {
+        var randomnumber = Math.floor((Math.random()*9)+1);
+        //console.log(randomnumber);
+
+        return randomnumber;
+    }
+    
+    //
+    
+    if($('shipping:city')){
+        $('shipping:city').observe('dblclick', shipping_easter_egg);
+    }
+    
+    function shipping_easter_egg(event) {
+
+        console.log(arguments.callee.name);
+
+        var element = event.element();
+
+        if(!event.shiftKey){
+                return false;
+        }
+
+        // https://www.npmjs.com/package/random-fullname
+
+        var randomFullName = require('random-fullname');
+
+        var random_fullname = randomFullName();
+
+        console.log(random_fullname);
+
+        // https://www.npmjs.com/package/random-firstname
+
+        var randomFirstName = require('random-firstname');
+
+        var random_firstname = randomFirstName();
+
+        console.log(random_firstname);
+
+        // https://www.npmjs.com/package/random-lastname
+
+        var randomLastName = require('random-lastname');
+
+        var random_lastname = randomFirstName();
+
+        console.log(random_lastname);
+
+        // https://github.com/mock-end/random-natural
+
+        var randomNatural = require('random-natural');
+
+        var random_number = randomNatural({ min: 1, max: 2 });
+
+        console.log(random_number);
+
+        // https://www.npmjs.com/package/random-month
+
+        var randomMonth = require('random-month');
+
+        var random_month = randomMonth();
+
+        console.log(random_month);
+
+        // https://www.npmjs.com/package/random-year
+
+        var randomYear = require('random-year');
+
+        var random_year = randomYear({ min: 1964, max: 1998 });
+
+        console.log(random_year);
+
+        // https://www.npmjs.com/package/cpf_cnpj
+
+        const libCpfCnpj = require("cpf_cnpj");
+        var CPF = libCpfCnpj.CPF;
+        var CNPJ = libCpfCnpj.CNPJ;
+
+        var generate_cpf = CPF.generate(true);
+
+        var generate_cnpj = CNPJ.generate(true);
+
+        var _cpf = generate_cpf;
+        var _cnpj = generate_cnpj;
+
+        // https://www.npmjs.com/package/random-item
+
+        var randomItem = require('random-item');
+
+        var random_cep = randomItem(['08215-430', '08250-580', '08210-510', '08210-000', '08290-630', '08210-570', '08215-630', '08270-001', '08220-831', '08215-070', '08210-610', '08210-050', '08210-120', '08295-380', '08295-480', '08295-410', '08275-001', '08215-290', '08215-540', '08215-000', '08295-420']);
+
+        console.log(random_cep);
+
+        //
+
+        $('shipping:firstname').value = random_firstname;
+        $('shipping:lastname').value = random_lastname;
+
+        if( $('shipping:gender') ){
+            $('shipping:gender').options[random_number].selected = "selected";
+        }
+
+        if ($('shipping:email')){
+            var _random_firstname = random_firstname.toLowerCase();
+            var _random_lastname = random_lastname.toLowerCase();
+            $('shipping:email').value = _random_firstname + '.' + _random_lastname + '@gmail.com';
+            //$('shipping:email').value = cleanString(_cpf) + '@' + cleanString(_cpf) + '.com.br';
+        }
+
+        if( $('shipping:company') ){
+            $('shipping:company').value = 'ACME Corporation S.A.';
+        }
+
+        if( $('shipping:day') ){
+            $('shipping:day').value = '25';
+            $('shipping:month').value = random_month;
+            $('shipping:year').value = random_year;
+        }
+
+        if( $('shipping:gender') ){
+            $('shipping:gender').options[1].selected = "selected";
+        }
+
+        if( $('shipping:taxvat') ){
+            $('shipping:taxvat').value = _cpf;
+        }
+
+        /*if( $('cpf') ){
+            $('cpf').value = _cpf;
+        }
+
+        if( $('rg') ){
+            $('rg').value = _cpf;
+        }
+
+        if( $('cnpj') ){
+            $('cnpj').value = _cnpj;
+        }*/
+
+        $('shipping:postcode').value = random_cep;
+
+        if( $('shipping_rua') ){
+            $('shipping_rua').value = 'rua';
+        }
+        if( $('shipping_numero') ){
+            $('shipping_numero').value = '1';        
+        }
+        if( $('shipping_complemento') ){
+            $('shipping_complemento').value = 'ap. 23 A';        
+        }
+
+        $('shipping:telephone').value = '(11) ' + '2' + randomnumber() + randomnumber() + randomnumber() + '-' + randomnumber() + randomnumber() + randomnumber() + randomnumber();
+
+        if( $('shipping:fax') ){
+            $('shipping:fax').value = '(11) ' + '97' + randomnumber() + randomnumber() + randomnumber() + '-' + randomnumber() + randomnumber() + randomnumber() + randomnumber();
+        }
+
+        if( $('shipping:company') ){
+                $('shipping:company').triggerEvent('keypress');
+        }
+
+        $('shipping:postcode').triggerEvent('blur');
+    }
+    
+</script>
+<!-- MOZG -->
